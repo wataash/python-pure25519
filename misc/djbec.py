@@ -29,6 +29,7 @@ except NameError: # pragma nocover
 import hashlib
 
 b = 256
+# 25519
 q = 2**255 - 19
 l = 2**252 + 27742317777372353535851937790883648493
 

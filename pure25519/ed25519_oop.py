@@ -77,6 +77,8 @@ class SigningKey(object):
         assert isinstance(sk_s, bytes)
         if not isinstance(prefix, bytes):
             prefix = prefix.encode('ascii')
+        if prefix == "":
+            breakp = 1
         sk_s = remove_prefix(sk_s, prefix)
         if encoding is not None:
             sk_s = from_ascii(sk_s, encoding=encoding)
@@ -178,14 +180,26 @@ class VerifyingKey(object):
         assert msg2 == msg
 
 def selftest():
+    """
+    cs_alg_ed25519.md
+    """
     message = b"crypto libraries should always test themselves at powerup"
     sk = SigningKey(b"priv0-VIsfn5OFGa09Un2MR6Hm7BQ5++xhcQskU2OGXG8jSJl4cWLZrRrVcSN2gVYMGtZT+3354J5jfmqAcuRSD9KIyg",
                     prefix="priv0-", encoding="base64")
+    print(sk.sk_s.hex())  # 548b...
+    print(sk.vk_s.hex())  # 7871...
+    print(sk.sk_s[32:] == sk.vk_s)  # True
+
     vk = VerifyingKey(b"pub0-eHFi2a0a1XEjdoFWDBrWU/t9+eCeY35qgHLkUg/SiMo",
                       prefix="pub0-", encoding="base64")
+    print(vk.vk_s.hex())  # 7871...
+
     assert sk.get_verifying_key() == vk
-    sig = sk.sign(message, prefix="sig0-", encoding="base64")
+    sig = sk.sign(message, prefix="sig0-", encoding="base64")  # TODO: understand
+    print(sig) # b'sig0-E/QrwtSF52x8+q0l4ahA7eJbRKc777ClKNg217Q0z4fiYMCdmAOI+rTLVkiFhX6k3D+wQQfKdJYMxaTUFfv1DQ'
+    print(sig.hex())  # 736967302d452f517277745346353278382b71306c3461684137654a62524b63373737436c4b4e6732313751307a346669594d43646d414f492b72544c566b69466858366b33442b775151664b644a594d78615455466676314451
+
     assert sig == b"sig0-E/QrwtSF52x8+q0l4ahA7eJbRKc777ClKNg217Q0z4fiYMCdmAOI+rTLVkiFhX6k3D+wQQfKdJYMxaTUFfv1DQ", sig
-    vk.verify(sig, message, prefix="sig0-", encoding="base64")
+    vk.verify(sig, message, prefix="sig0-", encoding="base64")  # TODO: read
 
 selftest()
